@@ -22,7 +22,7 @@ const recordOptions = {
 	 * 2160p => 35 ~ 45 Mbps
 	 */
 	videoBitsPerSecond : 8000000,
-	mimeType : 'video/webm'
+	mimeType : 'video/webm;codecs=h264'
 }
 
 let streamGlobal = null
@@ -63,54 +63,65 @@ const closeStream = () => {
 
 	videoContentGlobal.srcObject = null
 	recordStop()
-
-	prepareVideoData()
 }
 
 const recordStart = () => {
 	const recorder = recorderGlobal = new MediaRecorder(streamGlobal, recordOptions);
 	recorder.start()
 	recorder.ondataavailable = evt => handleRecordData(evt)
+	recorder.onstop = evt => onRecorderStop(evt)
 }
 
+let objectURL = null
+
 const handleRecordData = evt => {
+	console.log('handleRecordData()')
   recordChunks.push(evt.data)
+
+}
+
+const onRecorderStop = (evt) => {
+	console.log('onRecorderStop()')
+
+	// console.log(recordChunks)
+
+	const blob = new Blob(recordChunks, {type: 'video/webm'})
+	recordChunks = []
+	prepareVideoData(blob)
+}
+
+const prepareVideoData = (blob) => {
+	objectURL = URL.createObjectURL(blob)
+
+	downloadURL.value = objectURL
+	downloadName.value = 'test_' + new Date().getTime() + '.webm';
+
+	// handle replay
+	replayVideoGlobal.onloadeddata = onReplayLoadedData
+	replayVideoGlobal.src = objectURL
 }
 
 const recordStop = () => {
 	recorderGlobal.stop()
-
-	const blob = new Blob(recordChunks, {type: 'video/webm'})
-	recordChunks = []
-
-	downloadURL.value = URL.createObjectURL(blob)
-	// downloadName.value = 'test-' + new Date().getTime() + '.webm';
-
-	console.log(downloadURL)
-
-  // handle replay
-	replayVideoGlobal.onloadeddata = onReplayLoadedData
-	replayVideoGlobal.src = downloadURL.value
 }
 
-const onReplayLoadedData = (ObjectURL) => {
-	console.log(ObjectURL)
-}
-
-const prepareVideoData = () => {
+const onReplayLoadedData = () => {
+  // URL.revokeObjectURL(objectURL)
 }
 
 </script>
 
 <template>
   <div id="recorder">
+	  <h2>Recording</h2>
 	  <video id="videoContent" muted controls autoplay />
 	  <div id="endDiv" @click="closeStream">结束</div>
-    <br>
-    <a :download="downloadName" :href="downloadURL" id="link">download video</a>
+
 	  <br>
-	  <br>
+    <h2>Replay</h2>
     <video id="replayVideoContent" muted controls autoplay />
+	  <br>
+	  <a :download="downloadName" :href="downloadURL" id="link">download video</a>
   </div>
 </template>
 
