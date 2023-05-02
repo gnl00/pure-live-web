@@ -1,10 +1,3 @@
-<template>
-  <div id="content">
-    <video id="videoStream" muted autoplay></video>
-  </div>
-	<div id="endDiv" @click="endBtnClick">结束</div>
-</template>
-
 <script setup>
 import {onMounted, watch, ref} from "vue";
 
@@ -110,9 +103,22 @@ const uploadVideoChunks = () => {
 }
 </script>
 
+<template>
+	<div id="anchor">
+		<div id="videoContent">
+			<video id="videoStream" muted autoplay />
+		</div>
+		<div id="endDiv" @click="endBtnClick">结束</div>
+  </div>
+</template>
+
 <style scoped>
+#anchor {
+  margin: 10px;
+  padding: 10px;
+}
+
 #videoStream {
-	min-height: 70vh;
   border-radius: 10px;
 }
 
@@ -122,6 +128,5 @@ const uploadVideoChunks = () => {
   padding: 10px;
   font-size: 18px;
   border-radius: 10px;
-  min-width: 5em;
 }
 </style>

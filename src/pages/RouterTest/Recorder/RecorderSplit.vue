@@ -1,6 +1,5 @@
 <script setup>
-import {onMounted, ref} from "vue";
-
+import { onMounted, ref } from "vue";
 
 // 音频/视频流配置
 const mediaOptions = {
@@ -50,24 +49,33 @@ onMounted(() => {
 
 const openStream = () => {
 	return navigator.mediaDevices.getDisplayMedia(mediaOptions)
-			.then(stream => stream)
+			.then(stream => {				
+				return stream
+			})
 			.catch(err => {
 				console.log('getUserMedia() error ', err.message)
 			})
 }
 
 const closeStream = () => {
+	if (recorderGlobal.state === 'inactive') return
+
 	streamGlobal?.getTracks().forEach(track => {
 		track.stop()
 	})
 
 	videoContentGlobal.srcObject = null
 	recordStop()
+
+	console.log(recorderGlobal);
 }
 
 const recordStart = () => {
+	// https://developer.mozilla.org/zh-CN/docs/Web/API/MediaRecorder/dataavailable_event
 	const recorder = recorderGlobal = new MediaRecorder(streamGlobal, recordOptions);
-	recorder.start()
+	console.log(recorder);
+	// 将 timeslice 属性传递到开始媒体捕获的 MediaRecorder.start() 方法中，则每 timeslice 毫秒触发一次事件
+	recorder.start(1000)
 	recorder.ondataavailable = evt => handleRecordData(evt)
 	recorder.onstop = evt => onRecorderStop(evt)
 }
@@ -76,18 +84,23 @@ let objectURL = null
 
 const handleRecordData = evt => {
 	console.log('handleRecordData()')
-  recordChunks.push(evt.data)
+	const chunk = evt.data
+  recordChunks.push(chunk)
 
+	uploadBlob(chunk);
 }
 
 const onRecorderStop = (evt) => {
 	console.log('onRecorderStop()')
-
-	// console.log(recordChunks)
+	console.log(recordChunks)
 
 	const blob = new Blob(recordChunks, {type: 'video/webm'})
 	recordChunks = []
 	prepareVideoData(blob)
+}
+
+const recordStop = () => {
+	recorderGlobal.stop()
 }
 
 const prepareVideoData = (blob) => {
@@ -101,12 +114,46 @@ const prepareVideoData = (blob) => {
 	replayVideoGlobal.src = objectURL
 }
 
-const recordStop = () => {
-	recorderGlobal.stop()
-}
-
 const onReplayLoadedData = () => {
   // URL.revokeObjectURL(objectURL)
+}
+
+const uploadBlob = (chunk) => {
+	const chunks = []
+	chunks.push(chunk)
+	const blob = new Blob(chunks, {type: 'video/webm'});
+	// const fd = new FormData();
+	// fd.append('blob', blob, '');
+  // console.log(fd);
+
+
+	blobToArrayBuffer(blob);
+}
+
+const blobToArrayBuffer = (blob) => {
+
+	const reader = new FileReader();
+	reader.onload = () => {
+		const base64String = btoa(reader.result)
+		const arrayBuffer = reader.result
+		// console.log(arrayBuffer);
+		console.log(base64String);
+
+		doUploadBlob(base64String);
+	}
+	reader.readAsBinaryString(blob)
+}
+
+const doUploadBlob = (body) => {
+	const url = 'http://localhost:8080/test/blobUpload'
+	fetch(url, {
+		method: 'POST',
+		body
+	}).then(res => {
+		console.log('doUploadBlob success ',  res);
+	}).catch(err => {
+		console.log('doUploadBlob error ', err.message);
+	})
 }
 
 </script>

@@ -1,4 +1,4 @@
-import Recorder from "../pages/RouterTest/Recorder/Recorder.vue";
+import { createRouter, createWebHistory } from 'vue-router'
 
 const LiveMain = () => import("../pages/Live/LiveMain.vue")
 const LiveAnchor = () => import("../pages/Live/LiveAnchor.vue")
@@ -6,7 +6,9 @@ const LiveAudience = () => import("../pages/Live/LiveAudience.vue")
 const About = () => import("../pages/RouterTest/About/About.vue")
 const Profile = () => import("../pages/RouterTest/Profile/Profile.vue")
 const Upload = () => import("../pages/RouterTest/Upload/Upload.vue")
-import { createRouter, createWebHistory } from 'vue-router'
+import Recorder from "../pages/RouterTest/Recorder/Recorder.vue";
+import RecorderSplit from "../pages/RouterTest/Recorder/RecorderSplit.vue";
+
 
 const routes = [
 	{
@@ -36,6 +38,10 @@ const routes = [
 	{
 		path: '/record',
 		component: Recorder
+	},
+	{
+		path: '/split',
+		component: RecorderSplit
 	},
 ]
 
