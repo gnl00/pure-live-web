@@ -1,12 +1,18 @@
 <script setup>
-import LiveMain from "./pages/Live/LiveMain.vue";
-import RouterTest from "./pages/RouterTest/RouterTest.vue";
+import Wrapper from "./components/Wrapper/Wrapper.vue";
 </script>
 
 <template>
-  <live-main />
+	<h1 id="title">Pure Live</h1>
+  <wrapper>
+	  <router-view />
+  </wrapper>
+<!--	<live-main />-->
 <!--  <router-test />-->
 </template>
 
 <style scoped>
+#title {
+	color: #6ba5ed;
+}
 </style>
