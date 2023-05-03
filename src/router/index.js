@@ -9,7 +9,8 @@ const Upload = () => import("../pages/RouterTest/Upload/Upload.vue")
 import Recorder from "../pages/RouterTest/Recorder/Recorder.vue";
 import RecorderSplit from "../pages/RouterTest/Recorder/RecorderSplit.vue";
 import Response from "../pages/RouterTest/Response/Response.vue";
-import Websocket from "../pages/RouterTest/Websocket/Websocket.vue";
+import WebsocketSender from "../pages/RouterTest/Websocket/WebsocketSender.vue";
+import WebsocketReceiver from "../pages/RouterTest/Websocket/WebsocketReceiver.vue";
 
 const routes = [
 	{
@@ -49,8 +50,12 @@ const routes = [
 		component: Response
 	},
 	{
-		path: '/ws',
-		component: Websocket
+		path: '/wsSend',
+		component: WebsocketSender
+	},
+	{
+		path: '/wsRece',
+		component: WebsocketReceiver
 	},
 ]
 
