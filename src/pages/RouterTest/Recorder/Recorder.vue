@@ -72,12 +72,15 @@ const recordStart = () => {
 	recorder.onstop = evt => onRecorderStop(evt)
 }
 
+const recordStop = () => {
+	recorderGlobal.stop()
+}
+
 let objectURL = null
 
 const handleRecordData = evt => {
 	console.log('handleRecordData()')
   recordChunks.push(evt.data)
-
 }
 
 const onRecorderStop = (evt) => {
@@ -86,11 +89,16 @@ const onRecorderStop = (evt) => {
 	// console.log(recordChunks)
 
 	const blob = new Blob(recordChunks, {type: 'video/webm'})
+	const uploadBlob = new Blob(recordChunks, {type: 'application/octet-stream'})
+	
+	prepareReplayData(blob)
+
+	uploadVideoData(uploadBlob)
+
 	recordChunks = []
-	prepareVideoData(blob)
 }
 
-const prepareVideoData = (blob) => {
+const prepareReplayData = (blob) => {
 	objectURL = URL.createObjectURL(blob)
 
 	downloadURL.value = objectURL
@@ -101,13 +109,35 @@ const prepareVideoData = (blob) => {
 	replayVideoGlobal.src = objectURL
 }
 
-const recordStop = () => {
-	recorderGlobal.stop()
-}
-
 const onReplayLoadedData = () => {
   // URL.revokeObjectURL(objectURL)
 }
+
+const handleVideoBuffer = (blob) => {
+	const reader = new FileReader();
+	reader.onload = () => {
+		const arrayBuffer = reader.result;
+	}
+	reader.readAsArrayBuffer(blob);
+}
+
+const uploadVideoData = (body) => {
+	fetch('http://localhost:8080/test/videoUpload', {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/octet-stream'
+		},
+		body
+	})
+	.then(res => {
+		console.log(res);
+	})
+	.catch(err => {
+		console.log('uploadVideoData() error ', err.message);
+	})
+}
+
+
 
 </script>
 

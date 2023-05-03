@@ -121,13 +121,12 @@ const onReplayLoadedData = () => {
 const uploadBlob = (chunk) => {
 	const chunks = []
 	chunks.push(chunk)
-	const blob = new Blob(chunks, {type: 'video/webm'});
-	// const fd = new FormData();
-	// fd.append('blob', blob, '');
-  // console.log(fd);
+	// const blob = new Blob(chunks, {type: 'video/webm'});
+	const blob = new Blob([chunk], {type: 'application/octet-stream'});
 
+	doUploadBlob(blob);
 
-	blobToArrayBuffer(blob);
+	// blobToArrayBuffer(blob);
 }
 
 const blobToArrayBuffer = (blob) => {
@@ -137,15 +136,16 @@ const blobToArrayBuffer = (blob) => {
 		const base64String = btoa(reader.result)
 		const arrayBuffer = reader.result
 		// console.log(arrayBuffer);
-		console.log(base64String);
+		// console.log(base64String);
 
-		doUploadBlob(base64String);
+		doUploadBlob(arrayBuffer);
 	}
 	reader.readAsBinaryString(blob)
+
 }
 
 const doUploadBlob = (body) => {
-	const url = 'http://localhost:8080/test/blobUpload'
+	const url = 'http://localhost:8080/test/blobsUpload'
 	fetch(url, {
 		method: 'POST',
 		body

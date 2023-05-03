@@ -65,9 +65,9 @@ const endBtnClick = () => {
 	videoStream.srcObject = null
 	videoSource.value = null
 
-	for (const track of stream?.getTracks()) {
-    track.stop()
-	}
+	stream?.getTracks().forEach(track => {
+		track.stop()
+	})
 
 	recorder.stop()
 
@@ -76,30 +76,12 @@ const endBtnClick = () => {
 }
 
 
-let uploadVideoBody = null;
 const handleVideoChunks = () => {
-	if (videoChunks.length < 0) {
-		return
-  }
-
-	const fd = new FormData();
-	const blob = new Blob(videoChunks, {
-    type: 'video/webm; codecs=vp9'
-  });
-	fd.append('video', blob, 'video.webm')
-
-	console.log(fd)
-
-	uploadVideoBody = fd
 
 	uploadVideoChunks()
 }
 
 const uploadVideoChunks = () => {
-	fetch("http://localhost:8080/test/videoUpload", {
-		method: 'post',
-    body: uploadVideoBody
-  })
 }
 </script>
 

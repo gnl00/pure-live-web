@@ -8,7 +8,8 @@ const Profile = () => import("../pages/RouterTest/Profile/Profile.vue")
 const Upload = () => import("../pages/RouterTest/Upload/Upload.vue")
 import Recorder from "../pages/RouterTest/Recorder/Recorder.vue";
 import RecorderSplit from "../pages/RouterTest/Recorder/RecorderSplit.vue";
-
+import Response from "../pages/RouterTest/Response/Response.vue";
+import Websocket from "../pages/RouterTest/Websocket/Websocket.vue";
 
 const routes = [
 	{
@@ -42,6 +43,14 @@ const routes = [
 	{
 		path: '/split',
 		component: RecorderSplit
+	},
+	{
+		path: '/resp',
+		component: Response
+	},
+	{
+		path: '/ws',
+		component: Websocket
 	},
 ]
 
