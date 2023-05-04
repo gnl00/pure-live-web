@@ -84,7 +84,6 @@ const closeStream = () => {
 const clearVideoStream = () => {
   const videoContent = document.getElementById('videoContent');
   videoContent.srcObject = null
-  console.log(videoContent);
 }
 
 const recordStart = () => {
@@ -109,6 +108,17 @@ const onRecoderDataAvailable = evt => {
 const onRecorderStop = () => {
 	console.log('onRecorderStop()')
 	// console.log(recordChunks)
+
+  const reader = new FileReader();
+	reader.onload = () => {
+		const base64Data = reader.result;
+		console.log(base64Data)
+
+    const replay = document.getElementById('replay');
+		replay.src = base64Data
+  }
+	const blob = new Blob(recordChunks, {type: 'video/webm'})
+	reader.readAsDataURL(blob)
 
 	recordChunks = []
 }
@@ -169,6 +179,8 @@ const clickToSendBlob = () => {
   </div>
   <div>
     <video id="videoContent" muted controls autoplay />
+	  <video id="replay" muted controls autoplay />
+
     <div id="endDiv">
 			<button @click="closeStream">结束</button>
 		</div>
