@@ -1,14 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import videojs from "video.js";
+import Hls from "hls.js";
 
 let downloadLink = ref(null)
-let videoSource = ref('http://localhost:8888/video/index.m3u8')
 
 let chunks = []
-let latestObjectURL = null;
 let videoContentGlobal = null;
-let lastTimeUsedVideo = null;
+let hls = null;
 
 const ws = new WebSocket('ws://localhost:8080/ws/test/1');
 
@@ -16,9 +14,15 @@ ws.onmessage = message => {
   console.log(message);
 	let data = null
 	if (message && (data = message.data)) {
-		console.log('data before ', data)
-		// data = data.slice(data.indexOf('tsdata'))
-		// console.log('data after ', data)
+
+		if (Hls.isSupported()) {
+			if (!hls) {
+				hls = new Hls();
+      }
+
+			hls.loadSource(data)
+			hls.attachMedia(videoContentGlobal)
+    }
 
   }
 
@@ -33,32 +37,17 @@ ws.onmessage = message => {
     // const reader = new FileReader();
     // reader.onload = () => {
     //   const base64Data = reader.result
-
-    //   const renders = document.getElementsByClassName('videoRender')
-    //   for (const videoRender of renders) {
-    //     if (lastTimeUsedVideo != videoRender) {
-    //       videoRender.src = base64Data
-    //       console.log(videoRender);
-    //       lastTimeUsedVideo = videoRender
-    //       break;
-    //     }
-    //   }
+    // videoContentGlobal.src = base64Data
 
     // }
     // reader.readAsDataURL(blob);
 
     // URL.createObjectURL() 读取 blob
-    if (latestObjectURL) {
-      URL.revokeObjectURL(latestObjectURL)
-    }
-    console.log('latestObjectURL after revoke ', latestObjectURL);
-
     const objectURL = URL.createObjectURL(blob);
-    latestObjectURL = objectURL
 
     // save video to local
     const download = document.createElement('a');
-	  download.href = latestObjectURL
+	  download.href = objectURL
 	  download.click()
 
     // load video data from url
@@ -78,17 +67,15 @@ ws.onclose = evt => {
 	console.log('ws onclose() ', evt);
 }
 
+
 onMounted(() => {
   videoContentGlobal = document.getElementById('videoContent');
 
-	const player = videojs('videoJS')
-	console.log(player)
-	player.play()
+	// console.log(Hls.isSupported())
 })
 
 const generateVideo = () => {
   console.log(chunks);
-
   const blob = new Blob(chunks, {type: 'video/webm'});
 }
 
@@ -102,9 +89,7 @@ const generateVideo = () => {
   </div>
   <div>
     <img id="imgN" src="http://localhost:8888/image/test.png"  alt="test.png"/>
-    <video id="videoJS" class="video-js" autoplay muted controls preload="auto" >
-      <source :src="videoSource" />
-    </video>
+    <video id="m3u8Player" width="500" height="300" autoplay muted controls preload="auto" />
     <a href="http://localhost:8888/video/test.mp4">download from nginx</a>
   </div>
 </template>

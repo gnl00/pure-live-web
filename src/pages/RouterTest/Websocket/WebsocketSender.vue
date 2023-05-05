@@ -30,7 +30,7 @@ let downloadLink = ref(null)
 let streamGlobal = null
 let recorderGlobal = null
 
-const ws = new WebSocket('ws://localhost:8080/ws/test/0');
+let ws = new WebSocket('ws://localhost:8080/ws/test/0');
 ws.onmessage = message => {
   console.log(message);
   if (message && message.data instanceof Blob) {
@@ -88,7 +88,7 @@ const clearVideoStream = () => {
 
 const recordStart = () => {
 	const recorder = recorderGlobal = new MediaRecorder(streamGlobal, recordOptions);
-	recorder.start()
+	recorder.start(5000)
 	recorder.ondataavailable = evt => onRecoderDataAvailable(evt)
 	recorder.onstop = evt => onRecorderStop(evt)
 }
@@ -112,7 +112,7 @@ const onRecorderStop = () => {
   const reader = new FileReader();
 	reader.onload = () => {
 		const base64Data = reader.result;
-		console.log(base64Data)
+		// console.log(base64Data)
 
     const replay = document.getElementById('replay');
 		replay.src = base64Data
@@ -127,7 +127,7 @@ const wsSend = async (blobChunk) => {
   if (!ws) {
     ws = new WebSocket('ws://localhost:8080/ws/test/0');
   }
-  console.log(ws);
+  // console.log(ws);
 
   // 将 blob 转换为更低级别的 arrayBuffer 来处理
   // blobChunk.arrayBuffer().then(buffer => {
